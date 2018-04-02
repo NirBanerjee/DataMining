@@ -28,6 +28,4 @@ public class Values {
 	public void setRowIndex(int rowIndex) {
 		this.rowIndex = rowIndex;
 	}
-	
-	
 }

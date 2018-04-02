@@ -46,11 +46,4 @@ public class Feature {
 	public void setFeatureType(String featureType) {
 		this.featureType = featureType;
 	}
-	
-	
-	
-	
-	
-	
-
 }

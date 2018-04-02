@@ -48,9 +48,6 @@ public class DecisionTreeClassifier {
 		//Predict Test labels
 		
 		//Print tree
-		
-		
-	
-	}
 
+	}
 }
