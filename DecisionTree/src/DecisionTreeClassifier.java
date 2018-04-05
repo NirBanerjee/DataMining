@@ -32,12 +32,14 @@ public class DecisionTreeClassifier {
 		FileIO fileIO = new FileIO();
 		DataSet trainingSet = fileIO.readFile(trainFile);
 		System.out.println(trainingSet.getDataSize());
-		//Generate Validation Data
 		
 		//Process Test File and Obtain Test Data
 		DataSet testSet = fileIO.readFile(testFile);
 		System.out.println(testSet.getDataSize());
+		
 		//Build Tree using Train Data.
+		
+		
 		
 		//Use validation data to find optimal height of tree
 		

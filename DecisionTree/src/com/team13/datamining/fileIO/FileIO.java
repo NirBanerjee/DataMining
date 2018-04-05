@@ -1,6 +1,7 @@
 package com.team13.datamining.fileIO;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -73,6 +74,14 @@ public class FileIO {
 		//Create the dataset
 		DataSet dataset = new DataSet(rowIndex, featureList, valuesList);
 		return dataset;
+	}
+	
+	public void printToFile(String fileName, String[] linesToPrint) throws IOException		{
+		FileWriter fileWriter = new FileWriter(fileName);
+		for (String line : linesToPrint)	{
+			fileWriter.write(line);
+		}
+		fileWriter.close();
 	}
 
 }
