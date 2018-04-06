@@ -58,7 +58,7 @@ def read_dataset(path):
         # print(label)
         return [data,label]
 
-
+# Euclidean Distance
 def calcEuclidean(test_row, train_row,weight_vector):
     # print(test_row)
     type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
@@ -69,14 +69,72 @@ def calcEuclidean(test_row, train_row,weight_vector):
                              pow((test_row[3] - train_row[3]), 2),
                              pow((test_row[4] - train_row[4]), 2),
                              pow((test_row[5] - train_row[5]), 2)])
-    similarity = 1 / math.sqrt(np.dot(item_vector,weight_vector))
+    similarity = math.sqrt(np.dot(item_vector,weight_vector))
+    # print(type(similarity))
+    # print(similarity)
+    return math.sqrt(np.dot(item_vector,weight_vector))
+
+
+# Manhattan Distance
+def calcManhattan(test_row, train_row,weight_vector):
+    type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
+    life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
+    item_vector = np.asarray([type_sim,life_style_sim,
+                              abs(test_row[2] - train_row[2]),
+                              abs(test_row[3] - train_row[3]),
+                              abs(test_row[4] - train_row[4]),
+                              abs(test_row[4] - train_row[4]),
+                              ])
+    similarity = np.dot(item_vector,weight_vector)
+    similarity = similarity.astype(float)
+    # print(type(similarity))
+    # print(similarity)
+    return similarity.astype(float)
+
+
+# Chebyshev Distance
+def calcChebyshev(test_row, train_row,weight_vector):
+    type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
+    life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
+    similarity = np.asarray([type_sim * weight_vector[0],
+                             life_style_sim * weight_vector[1],
+                             abs(test_row[2] - train_row[2]) * weight_vector[2],
+                             abs(test_row[3] - train_row[3]) * weight_vector[3],
+                             abs(test_row[4] - train_row[4]) * weight_vector[4],
+                             abs(test_row[4] - train_row[4]) * weight_vector[5],
+                             ]).max()
+    # print(similarity)
+    return similarity
+
+# Standard Euclidean Distance
+def calcStdEuclidean(test_row,train_row,weight_vector,std_list):
+    type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
+    life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
+    item_vector = np.asarray([type_sim, life_style_sim,
+                              pow((test_row[2] - train_row[2])/std_list[2],2),
+                              pow((test_row[3] - train_row[3]) / std_list[3], 2),
+                              pow((test_row[4] - train_row[4]) / std_list[4], 2),
+                              pow((test_row[5] - train_row[5]) / std_list[5], 2),
+                              ])
+    similarity = math.sqrt(np.dot(item_vector, weight_vector))
+    # print(type(similarity))
+    # print(similarity)
+    return similarity
+
+# Cosine Distance
+def calcCosine(test_row,train_row,weight_vector):
+    np.multiply(train_row,np.sqrt(weight_vector))
+    np.multiply(test_row,np.sqrt(weight_vector))
+    similarity = np.dot(test_row, train_row) / (math.sqrt(np.dot(test_row, test_row)) * math.sqrt(np.dot(train_row, train_row)))
     return similarity
 
 
-def knn_classifier(train_data,train_label,test_data,k,wv=None):
+def knn_classifier(train_data,train_label,test_data,k,wv=None,vote_method=1,distance_method=2):
     # print("train shape: {}".format(train_data.shape))
     # print("train lable shape: {}".format(train_label.shape))
     # print("test shape: {}".format(test_data.shape))
+
+    std_list = np.std(train_data,axis=0)
 
     if wv is None:
         weight_vector = np.vstack(np.ones(len(train_data[0])))
@@ -88,19 +146,42 @@ def knn_classifier(train_data,train_label,test_data,k,wv=None):
         votes = {}
         similarity_list = []
         for train_row in train_data:
-            similarity = calcEuclidean(test_row, train_row,weight_vector)
+            if distance_method == 1:
+                similarity = 1 / calcEuclidean(test_row, train_row,weight_vector)
+            elif distance_method == 2:
+                similarity = 1 / float(calcManhattan(test_row, train_row, weight_vector))
+            elif distance_method == 3:
+                similarity = 1 / calcChebyshev(test_row,train_row,weight_vector)
+            elif distance_method == 4:
+                similarity = 1 / calcStdEuclidean(test_row, train_row, weight_vector,std_list)
+            elif distance_method == 5:
+                similarity = calcCosine(test_row,train_row,weight_vector)
             # print("similarity: {}".format(similarity))
             similarity_list.append(similarity)
 
-        similarity_list = np.argsort(np.asarray(similarity_list))[::-1]
+        similarity_index_list = np.argsort(np.asarray(similarity_list))[::-1]
+
         # print(similarity_list)
-        for i in range(0, k):
-            label = train_label[similarity_list[i]]
-            # print(label)
-            if label not in votes:
-                votes[label] = 1
-            else:
-                votes[label] = votes[label] + 1
+        # count the number of existence
+        if vote_method == 1:
+            for i in range(0, k):
+                label = train_label[similarity_index_list[i]]
+                # print(label)
+                if label not in votes:
+                    votes[label] = 1
+                else:
+                    votes[label] = votes[label] + 1
+        # sum up the similarity scores of each label
+        elif vote_method == 2:
+            similarity_score_list = np.sort(np.asarray(similarity_list))[::-1]
+            # print(similarity_score_list)
+            for i in range(0, k):
+                label = train_label[similarity_index_list[i]]
+                if label not in votes:
+                    votes[label] = similarity_score_list[i]
+                else:
+                    votes[label] = votes[label] + similarity_score_list[i]
+
         votes = sorted(votes.items(), key=lambda kv: kv[1], reverse=True)
         pred = votes[0][0]
         pred_label.append(pred)
@@ -173,31 +254,64 @@ def knn():
     num_of_attr = 6
     # read training data file
     train_data_list = read_dataset('data/trainProdSelection.arff')
-    train_data = train_data_list[0]
-    train_label = train_data_list[1]
+    train_data = np.asarray(train_data_list[0])
+    train_label = np.asarray(train_data_list[1])
     train_data_label = np.hstack((np.asarray(train_data),np.vstack(train_label)))
     # print(train_data_label)
 
     # read testing data file -- using Frobenius norm, try and change back to min-max
     test_data_list = read_dataset('data/testProdSelection.arff')
-    test_data = test_data_list[0]
+    test_data = np.asarray(test_data_list[0])
 
     # print(knn_classifier(train_data,train_label,test_data,k))
     max_accuracy = 0
-    count = 0
-    while max_accuracy < 0.9:
-        count = count + 1
+    max_label = []
+    max_weight_vector = []
+    min_accuracy = 1
+    min_label = []
+    min_weight_vector = []
+    current_accuracy = 0
+
+    epoch = 0
+    while current_accuracy < 0.901:
+        epoch = epoch + 1
+        if epoch > 100:
+            break
+        print("epoch: {}".format(epoch))
         weight_vector,accuracy = weight_optimization(train_data_label,cross_val_folds,num_of_attr,k)
         print("weight_vector: {}".format(weight_vector))
         print("highest accuracy: {}".format(accuracy))
 
         pred_label = knn_classifier(train_data, train_label, test_data, k, weight_vector)
         print("predict label: {}".format(pred_label))
-        max_accuracy = accuracy
+        if accuracy > max_accuracy:
+            max_accuracy = accuracy
+            max_label = pred_label
+            max_weight_vector = weight_vector
+        if accuracy < min_accuracy:
+            min_accuracy = accuracy
+            min_label = pred_label
+            min_weight_vector = weight_vector
+        current_accuracy = accuracy
 
+
+    print("================ Result ================")
     print("highest accuracy: {}".format(max_accuracy))
-    print("count: {}".format(count))
+    print("highest labels: {}".format(max_label))
+    print("highest weight vector: {}".format(max_weight_vector))
+    print("lowest accuracy: {}".format(min_accuracy))
+    print("lowest labels: {}".format(min_label))
+    print("lowest weight vector: {}".format(min_weight_vector))
+    print("accuracy difference: {}".format(max_accuracy - min_accuracy))
+    print("final epoch: {}".format(epoch))
+    print("=======================================")
 
+    # weight_vector,accuracy = weight_optimization(train_data_label,cross_val_folds,num_of_attr,k)
+    # print("weight_vector: {}".format(weight_vector))
+    # print("highest accuracy: {}".format(accuracy))
+
+    # pred_label = knn_classifier(train_data, train_label, test_data, k, weight_vector)
+    # print("predict label: {}".format(pred_label))
 
 
 if __name__ != '__main__':
