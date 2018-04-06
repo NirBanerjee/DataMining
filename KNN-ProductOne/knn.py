@@ -60,7 +60,7 @@ def read_dataset(path):
 
 
 def calcEuclidean(test_row, train_row,weight_vector):
-    print(test_row)
+    # print(test_row)
     type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
     life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
     item_vector = np.asarray([type_sim,
@@ -74,9 +74,9 @@ def calcEuclidean(test_row, train_row,weight_vector):
 
 
 def knn_classifier(train_data,train_label,test_data,k,wv=None):
-    print("train shape: {}".format(train_data.shape))
-    print("train lable shape: {}".format(train_label.shape))
-    print("test shape: {}".format(test_data.shape))
+    # print("train shape: {}".format(train_data.shape))
+    # print("train lable shape: {}".format(train_label.shape))
+    # print("test shape: {}".format(test_data.shape))
 
     if wv is None:
         weight_vector = np.vstack(np.ones(len(train_data[0])))
@@ -111,7 +111,9 @@ def knn_classifier(train_data,train_label,test_data,k,wv=None):
 
 def calc_accuracy(real_label,pred_label):
     correct = 0
-    for i in pred_label:
+    for i in range(0,len(pred_label)):
+        # print("pred_label[{}]: {}".format(i,pred_label[i]))
+        # print("real_label[{}]: {}".format(i,real_label[i]))
         if pred_label[i] == real_label[i]:
             correct = correct + 1
 
@@ -119,15 +121,18 @@ def calc_accuracy(real_label,pred_label):
 
 
 def cross_validation(data, folds, k, wv):
-    print("data shape: {}".format(data.shape))
+    # print("data shape: {}".format(data.shape))
     avg_accuracy = 0
     for i in range(0,folds):
         np.random.shuffle(data)
         train, test = data[:int(len(data)*0.8),:], data[int(len(data)*0.8):,:]
         real_label = test[:,-1]
-        pred_label = knn_classifier(np.asarray(train[:,:-1]).astype(float), train[:,-1],test[:,:-1], k)
-        avg_accuracy = avg_accuracy + calc_accuracy(real_label,pred_label)
+        pred_label = knn_classifier(np.asarray(train[:,:-1]).astype(float), train[:,-1],np.asarray(test[:,:-1]).astype(float), k)
+        acc = calc_accuracy(real_label,pred_label)
+        # print("acc: {}".format(acc))
+        avg_accuracy = avg_accuracy + acc
 
+    # print("avg accuracy: {}".format(avg_accuracy))
     return avg_accuracy / folds
 
 
@@ -136,10 +141,10 @@ def weight_optimization(data,folds,num_of_attr, k):
     accuracy = cross_validation(data,folds,k,weight_vector)
     print("accuracy: {}".format(accuracy))
 
-    for i in num_of_attr:
+    for i in range(0,num_of_attr):
         weight_vector[i] = weight_vector[i]*2
         # cross validation
-        attr_accuracy = cross_validation(data,folds,k,weight_vector)
+        attr_accuracy = cross_validation(data,folds, k, weight_vector)
         while True:
             weight_vector[i] = weight_vector[i] * 2
             attr_accuracy = cross_validation(data, folds, k, weight_vector)
@@ -149,30 +154,50 @@ def weight_optimization(data,folds,num_of_attr, k):
                 weight_vector[i] = weight_vector[i] / 2
                 break
 
+        while True:
+            weight_vector[i] = weight_vector[i] / 2
+            attr_accuracy = cross_validation(data, folds, k, weight_vector)
+            if attr_accuracy > accuracy:
+                accuracy = attr_accuracy
+            else:
+                weight_vector[i] = weight_vector[i] * 2
+                break
+
     return weight_vector,accuracy
 
 
 def knn():
 
     k = 3
+    cross_val_folds = 5
+    num_of_attr = 6
     # read training data file
     train_data_list = read_dataset('data/trainProdSelection.arff')
     train_data = train_data_list[0]
     train_label = train_data_list[1]
     train_data_label = np.hstack((np.asarray(train_data),np.vstack(train_label)))
-    print(train_data_label)
+    # print(train_data_label)
 
     # read testing data file -- using Frobenius norm, try and change back to min-max
     test_data_list = read_dataset('data/testProdSelection.arff')
     test_data = test_data_list[0]
 
     # print(knn_classifier(train_data,train_label,test_data,k))
+    max_accuracy = 0
+    count = 0
+    while max_accuracy < 0.9:
+        count = count + 1
+        weight_vector,accuracy = weight_optimization(train_data_label,cross_val_folds,num_of_attr,k)
+        print("weight_vector: {}".format(weight_vector))
+        print("highest accuracy: {}".format(accuracy))
 
-    weight_vector,accuracy = weight_optimization(train_data_label,5,6,k)
+        pred_label = knn_classifier(train_data, train_label, test_data, k, weight_vector)
+        print("predict label: {}".format(pred_label))
+        max_accuracy = accuracy
 
-    pred_label = knn_classifier(train_data, train_label, test_data, k, weight_vector)
+    print("highest accuracy: {}".format(max_accuracy))
+    print("count: {}".format(count))
 
-    
 
 
 if __name__ != '__main__':
