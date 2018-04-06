@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.team13.datamining.c45.EntropyCalculator;
 import com.team13.datamining.datamodels.DataSet;
 import com.team13.datamining.datamodels.Feature;
 import com.team13.datamining.datamodels.Values;
@@ -62,7 +63,7 @@ public class DecisionTree {
 			return leafNode;
 		}
 		
-		if (featureList.size() == 0)	{
+		if (EntropyCalculator.getEntropyValue(valuesList, targetFeature) == 0)	{
 			String leafClass = valuesList.get(0).getFeatureValueMap().get(targetFeature.getFeatureName());
 			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
 			return leafNode;
@@ -83,7 +84,7 @@ public class DecisionTree {
 		List<Values> valuesList = dataSet.getValueList();
 		Feature targetFeature = dataSet.getLabelFeature();
 		
-		rootNode = this.constructTree(featureList, valuesList, targetFeature);
+		this.rootNode = this.constructTree(featureList, valuesList, targetFeature);
 		
 		//Generate Validation and Test Data.
 //		int stepSize = dataSet.getDataSize() / foldFactor;
