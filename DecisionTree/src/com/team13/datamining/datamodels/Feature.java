@@ -33,16 +33,26 @@ public class Feature {
 		}
 	}
 	
-	//Getters and Setters
+	public ArrayList<String> getFeatureValues() {
+		return featureValues;
+	}
+
+	public void setFeatureValues(ArrayList<String> featureValues) {
+		this.featureValues = featureValues;
+	}
+
 	public String getFeatureName() {
 		return featureName;
 	}
+	
 	public void setFeatureName(String featureName) {
 		this.featureName = featureName;
 	}
+	
 	public String getFeatureType() {
 		return featureType;
 	}
+	
 	public void setFeatureType(String featureType) {
 		this.featureType = featureType;
 	}

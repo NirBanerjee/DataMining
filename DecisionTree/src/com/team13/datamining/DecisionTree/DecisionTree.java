@@ -4,7 +4,11 @@
  */
 package com.team13.datamining.DecisionTree;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.team13.datamining.datamodels.DataSet;
 import com.team13.datamining.datamodels.Feature;
@@ -18,18 +22,63 @@ public class DecisionTree {
 		this.rootNode = null;
 	}
 	
-	public DecisionTreeNode constructTree(List<Feature> featureList, List<Values> valuesList, Feature targetFeature)	{
+	private String getMajorityClass(List<Values> valuesList, Feature feature) throws IOException	{
+		
+		List<String> valuesofTarget = new ArrayList<>(feature.getFeatureValues());
+		String targetName = feature.getFeatureName();
+		Map<String, Integer> labelCount = new HashMap<String, Integer>();
+		
+		for (String label : valuesofTarget)	{
+			labelCount.put(label, 0);
+		}
+		
+		for (Values val : valuesList)	{
+			Map<String, String> pairs = val.getFeatureValueMap();
+			String lab = pairs.get(targetName);
+			if(!labelCount.containsKey(lab))	{
+				throw new IOException("Invalid data !!");
+			}
+			labelCount.put(lab, labelCount.get(lab) + 1);
+		}
+		
+		String maxLabel = "";
+		int maxCount = 0;
+		
+		for(String key : labelCount.keySet())	{
+			int count = labelCount.get(key);
+			if (count > maxCount)	{
+				maxLabel = key;
+				maxCount = count;
+			}
+		}
+		return maxLabel;
+	}
+	
+	private DecisionTreeNode constructTree(List<Feature> featureList, List<Values> valuesList, Feature targetFeature) throws IOException	{
+		
+		if (featureList.size() == 0)	{
+			String leafClass = this.getMajorityClass(valuesList, targetFeature);
+			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
+			return leafNode;
+		}
+		
+		if (featureList.size() == 0)	{
+			String leafClass = valuesList.get(0).getFeatureValueMap().get(targetFeature.getFeatureName());
+			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
+			return leafNode;
+		}
+		
 		
 		return null;
 	}
 	
-	public void buildDecisionTree(DataSet dataSet)	{
+	public void buildDecisionTree(DataSet dataSet) throws IOException	{
 		
 		//generate validation data
-		int foldFactor = 5;
+		//int foldFactor = 5;
 		
 		//double validationError = 0.0;
-		int startIndex = 0;
+		//int startIndex = 0;
 		List<Feature> featureList = dataSet.getFeatureList();
 		List<Values> valuesList = dataSet.getValueList();
 		Feature targetFeature = dataSet.getLabelFeature();
@@ -52,9 +101,6 @@ public class DecisionTree {
 //			trainingDataList.addAll(new ArrayList<>(valuesList.subList(startIndex + stepSize, valuesList.size())));
 //			DataSet trainingSet = new DataSet(trainingDataList.size(), featureList, trainingDataList);
 //			trainingSets[i] = trainingSet;
-//		}
-		
-		
-		
+//		}		
 	}
 }
