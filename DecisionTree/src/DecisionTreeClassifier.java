@@ -4,8 +4,9 @@
  */
 import java.io.IOException;
 
+import com.team13.datamining.DecisionTree.DecisionTree;
 import com.team13.datamining.datamodels.DataSet;
-import com.team13.datamining.fileIO.*;
+import com.team13.datamining.fileIO.FileIO;
 
 public class DecisionTreeClassifier {
 
@@ -31,16 +32,14 @@ public class DecisionTreeClassifier {
 		//Process the input file and load all input data into data class
 		FileIO fileIO = new FileIO();
 		DataSet trainingSet = fileIO.readFile(trainFile);
-		System.out.println(trainingSet.getDataSize());
 		
 		//Process Test File and Obtain Test Data
 		DataSet testSet = fileIO.readFile(testFile);
-		System.out.println(testSet.getDataSize());
+		//System.out.println(testSet.getDataSize());
 		
 		//Build Tree using Train Data.
-		
-		
-		
+		DecisionTree dTree = new DecisionTree();
+		dTree.buildDecisionTree(trainingSet);
 		//Use validation data to find optimal height of tree
 		
 		//Predict Train labels after building tree

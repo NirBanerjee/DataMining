@@ -13,6 +13,14 @@ public class Values {
 	private Map<String, String> featureValueMap;
 	private int rowIndex;
 	
+	public Map<String, String> getFeatureValueMap() {
+		return featureValueMap;
+	}
+
+	public void setFeatureValueMap(Map<String, String> featureValueMap) {
+		this.featureValueMap = featureValueMap;
+	}
+
 	public Values(int rowIndex, String[] lineParts, List<Feature> featureList)	{
 		this.rowIndex = rowIndex;
 		featureValueMap = new HashMap<>();
