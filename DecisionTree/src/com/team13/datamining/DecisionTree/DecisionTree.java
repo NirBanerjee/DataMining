@@ -62,7 +62,7 @@ public class DecisionTree {
 			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
 			return leafNode;
 		}
-		
+		 
 		if (EntropyCalculator.getEntropyValue(valuesList, targetFeature) == 0)	{
 			String leafClass = valuesList.get(0).getFeatureValueMap().get(targetFeature.getFeatureName());
 			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
