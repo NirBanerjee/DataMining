@@ -7,6 +7,11 @@ LIFE_STYLE_MATRIX = np.linalg.eig(np.diag((1,2,3,4)))[1]
 
 
 def read_dataset(path):
+    '''
+    Read dataset from files and return dataset list and associated label list.
+    :param path: file path to the dataset
+    :return: [data,label] list of dataset, list of label
+    '''
     with open(path) as data_file:
         reader = list(csv.reader(data_file))
         # print(reader)
@@ -58,8 +63,15 @@ def read_dataset(path):
         # print(label)
         return [data,label]
 
-# Euclidean Distance
+
 def calcEuclidean(test_row, train_row,weight_vector):
+    '''
+    Calculate the vector distance using Euclidean distance method.
+    :param test_row: vector from testing dataset
+    :param train_row: vector from training dataset
+    :param weight_vector: weighted vector
+    :return: similarity score
+    '''
     # print(test_row)
     type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
     life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
@@ -75,8 +87,14 @@ def calcEuclidean(test_row, train_row,weight_vector):
     return math.sqrt(np.dot(item_vector,weight_vector))
 
 
-# Manhattan Distance
 def calcManhattan(test_row, train_row,weight_vector):
+    '''
+        Calculate the vector distance using Mahattan distance method.
+        :param test_row: vector from testing dataset
+        :param train_row: vector from training dataset
+        :param weight_vector: weighted vector
+        :return: similarity score
+        '''
     type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
     life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
     item_vector = np.asarray([type_sim,life_style_sim,
@@ -92,8 +110,14 @@ def calcManhattan(test_row, train_row,weight_vector):
     return similarity.astype(float)
 
 
-# Chebyshev Distance
 def calcChebyshev(test_row, train_row,weight_vector):
+    '''
+            Calculate the vector distance using Chebyshev distance method.
+            :param test_row: vector from testing dataset
+            :param train_row: vector from training dataset
+            :param weight_vector: weighted vector
+            :return: similarity score
+            '''
     type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
     life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
     similarity = np.asarray([type_sim * weight_vector[0],
@@ -106,8 +130,15 @@ def calcChebyshev(test_row, train_row,weight_vector):
     # print(similarity)
     return similarity
 
-# Standard Euclidean Distance
+
 def calcStdEuclidean(test_row,train_row,weight_vector,std_list):
+    '''
+            Calculate the vector distance using Standard Euclidean distance method.
+            :param test_row: vector from testing dataset
+            :param train_row: vector from training dataset
+            :param weight_vector: weighted vector
+            :return: similarity score
+            '''
     type_sim = 1 - TYPE_MATRIX[int(test_row[0]) - 1][int(train_row[0]) - 1]
     life_style_sim = 1 - LIFE_STYLE_MATRIX[int(test_row[1]) - 1][int(train_row[1]) - 1]
     item_vector = np.asarray([type_sim, life_style_sim,
@@ -121,15 +152,33 @@ def calcStdEuclidean(test_row,train_row,weight_vector,std_list):
     # print(similarity)
     return similarity
 
-# Cosine Distance
+
 def calcCosine(test_row,train_row,weight_vector):
+    '''
+            Calculate the vector distance using Cosine similarity method.
+            :param test_row: vector from testing dataset
+            :param train_row: vector from training dataset
+            :param weight_vector: weighted vector
+            :return: similarity score
+            '''
     np.multiply(train_row,np.sqrt(weight_vector))
     np.multiply(test_row,np.sqrt(weight_vector))
     similarity = np.dot(test_row, train_row) / (math.sqrt(np.dot(test_row, test_row)) * math.sqrt(np.dot(train_row, train_row)))
     return similarity
 
 
-def knn_classifier(train_data,train_label,test_data,k,wv=None,vote_method=1,distance_method=2):
+def knn_classifier(train_data,train_label,test_data,k,wv=None,vote_method=2,distance_method=3):
+    '''
+    K-Nearest-Neighbour classifier method.
+    :param train_data: trainning dataset
+    :param train_label: label list from trainning dataset
+    :param test_data: testing dataset
+    :param k: number of the nearest neighbours
+    :param wv: weighted vector
+    :param vote_method: options for counting methods
+    :param distance_method: options for distance calculation methods
+    :return: list of predict label
+    '''
     # print("train shape: {}".format(train_data.shape))
     # print("train lable shape: {}".format(train_label.shape))
     # print("test shape: {}".format(test_data.shape))
@@ -191,6 +240,12 @@ def knn_classifier(train_data,train_label,test_data,k,wv=None,vote_method=1,dist
 
 
 def calc_accuracy(real_label,pred_label):
+    '''
+    Calculate the accuracy.
+    :param real_label: the real label
+    :param pred_label: the predicted label
+    :return: accuracy score
+    '''
     correct = 0
     for i in range(0,len(pred_label)):
         # print("pred_label[{}]: {}".format(i,pred_label[i]))
@@ -202,13 +257,21 @@ def calc_accuracy(real_label,pred_label):
 
 
 def cross_validation(data, folds, k, wv):
+    '''
+    Cross validation method.
+    :param data: dataset
+    :param folds: number of folds for cross validation
+    :param k:  number of nearest neighbour
+    :param wv: weighted vector
+    :return: average accuracy score
+    '''
     # print("data shape: {}".format(data.shape))
     avg_accuracy = 0
     for i in range(0,folds):
         np.random.shuffle(data)
         train, test = data[:int(len(data)*0.8),:], data[int(len(data)*0.8):,:]
         real_label = test[:,-1]
-        pred_label = knn_classifier(np.asarray(train[:,:-1]).astype(float), train[:,-1],np.asarray(test[:,:-1]).astype(float), k)
+        pred_label = knn_classifier(np.asarray(train[:,:-1]).astype(float), train[:,-1],np.asarray(test[:,:-1]).astype(float), k,wv)
         acc = calc_accuracy(real_label,pred_label)
         # print("acc: {}".format(acc))
         avg_accuracy = avg_accuracy + acc
@@ -218,6 +281,14 @@ def cross_validation(data, folds, k, wv):
 
 
 def weight_optimization(data,folds,num_of_attr, k):
+    '''
+    Weight optimization method. To find the best weight for each attribute.
+    :param data: dataset
+    :param folds: number of folds for cross validation
+    :param num_of_attr: number of attributes
+    :param k: number of nearest neighbours
+    :return: weighted vector, accuracy
+    '''
     weight_vector = np.ones(num_of_attr)
     accuracy = cross_validation(data,folds,k,weight_vector)
     print("accuracy: {}".format(accuracy))
