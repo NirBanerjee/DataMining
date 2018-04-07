@@ -4,6 +4,7 @@ import weka.core.converters as converters
 from weka.core.converters import Loader
 import weka.core.jvm as jvm
 
+
 # jvm.start(class_path=['weka.jar'])
 # loader = Loader(classname="weka.core.converters.ArffLoader")
 # data = loader.load_file("trainProdIntro.binary.arff")
@@ -54,21 +55,11 @@ def classify(input, matrixone, matrixtwo, labels, k, minVals, maxVals):
     # sort the distance
     sortedDistIndices = argsort(distance)
 
-    classCount = {}  # define a dictionary (can be append element)
+    ksum=0
     for i in range(k):
-        # choose the min k distance
-        voteLabel = labels[sortedDistIndices[i]]
-        ## count the times labels occur
-        classCount[voteLabel] = classCount.get(voteLabel, 0) + 1
+        ksum += labels[sortedDistIndices[i]]
 
-    # the max voted class will return
-    maxCount = 0
-    for key, value in classCount.items():
-        if value > maxCount:
-            maxCount = value
-            maxIndex = key
-
-    return maxIndex
+    return ksum / k
 
 if __name__ == '__main__':
     # initial symbol transfer
@@ -102,13 +93,13 @@ if __name__ == '__main__':
     matrixone = []
     matrixtwo = []
     label = []
-    with open('train5') as finput:
+    with open('train_real5') as finput:
         for a in finput:
             if a[-1] == '\n':
                 a=a[:-1]
             a = a.split(",")
             if len(a) == 9:
-                label.append(a[8])
+                label.append(float(a[8]))
                 one, two = tranfer(a)
                 matrixone.append(one)
                 matrixtwo.append(two)
@@ -119,13 +110,18 @@ if __name__ == '__main__':
     matrixtwo = Norm(matrixtwo)
     count = 0
     total= 0
-    with open('test5') as ftest:
+    real=[]
+    predict=[]
+    with open('test_real5') as ftest:
         for b in ftest:
             total+=1
-            actual=b[-2]
-            b = b[:-2].split(",")
+            ls=b.split(",")
+            real.append(float(ls[-1]))
+            b = ls[:-1]
+            b=ls
             res = classify(b, matrixone, matrixtwo, label, 5, minVals, maxVals)
-            # print(str(total)+" "+res)
-            if (actual == res):
-                count+=1
-    print(count/total)
+            # print(str(total)+" "+str(res))
+            predict.append(res)
+    real=array(real)
+    predict=array(predict)
+    print(((real - predict) ** 2).mean(axis=None))
