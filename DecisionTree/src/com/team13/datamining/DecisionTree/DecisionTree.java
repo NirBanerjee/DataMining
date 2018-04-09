@@ -24,6 +24,37 @@ public class DecisionTree {
 		this.rootNode = null;
 	}
 	
+	private void printTreeUtil(DecisionTreeNode root, StringBuilder sb, ArrayList<String> finalStr)	{
+		
+		if(root.isLeaf())	{
+			StringBuilder path = new StringBuilder(sb);
+			path.append(root.getTargetClass());
+			finalStr.add(path.toString());
+		}	else	{
+			sb.append(root.getFeature().getFeatureName());
+			HashMap<String, DecisionTreeNode> children = root.getChildren();
+			for (String valueName : children.keySet()) {
+				StringBuilder temp = new StringBuilder(sb);
+				temp.append("(Value = ");
+				temp.append(valueName);
+				temp.append(") => ");
+				printTreeUtil(children.get(valueName), temp, finalStr);
+			}
+			
+		}
+	}
+
+	private void printTree() {
+		ArrayList<String> finalStr = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
+		DecisionTreeNode tempNode = this.rootNode;
+		printTreeUtil(tempNode, sb, finalStr);
+		
+		for (String str : finalStr)	{
+			System.out.println(str);
+		}
+	}
+	
 	private String getMajorityClass(List<Values> valuesList, Feature feature) throws IOException	{
 		
 		List<String> valuesofTarget = new ArrayList<>(feature.getFeatureValues());
@@ -65,6 +96,7 @@ public class DecisionTree {
 		}
 		
 		double H_Y = EntropyCalculator.getEntropyValue(valuesList, targetFeature);
+		
 		if (H_Y == 0)	{
 			String leafClass = valuesList.get(0).getFeatureValueMap().get(targetFeature.getFeatureName());
 			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
@@ -73,6 +105,7 @@ public class DecisionTree {
 		
 		FeatureSelector fs = new FeatureSelector(featureList, valuesList, targetFeature);
 		Feature feat = fs.getBestFeature();
+		//System.out.println("Best Feature = " + feat.getFeatureName());
 		
 		DecisionTreeNode node = new DecisionTreeNode(feat);
 		featureList.remove(feat);
@@ -90,41 +123,21 @@ public class DecisionTree {
 			}
 		}
 		
-		featureList.add(feat);
+		featureList.add(feat); 
 		
 		return node;
 	}
 	
 	public void buildDecisionTree(DataSet dataSet) throws IOException	{
 		
-		//generate validation data
-		//int foldFactor = 5;
-		
-		//double validationError = 0.0;
-		//int startIndex = 0;
 		List<Feature> featureList = dataSet.getFeatureList();
 		List<Values> valuesList = dataSet.getValueList();
 		Feature targetFeature = dataSet.getLabelFeature();
 		
 		this.rootNode = this.buildTree(featureList, valuesList, targetFeature);
 		
-		//Generate Validation and Test Data.
-//		int stepSize = dataSet.getDataSize() / foldFactor;
-//		DataSet[] validationSets = new DataSet[foldFactor];
-//		DataSet[] trainingSets = new DataSet[foldFactor];
-//		for (int i = 0; i < foldFactor; i++)	{
-//			List<Values> validationDataList = new ArrayList<>(valuesList.subList(startIndex, startIndex + stepSize));
-//			DataSet validationSet = new DataSet(validationDataList.size(), featureList, validationDataList);
-//			validationSets[i] = validationSet;
-//			
-//			List<Values> trainingDataList = new ArrayList<>();
-//			if(startIndex != 0)	{
-//				trainingDataList = new ArrayList<>(valuesList.subList(0, startIndex));	
-//			}
-//			trainingDataList.addAll(new ArrayList<>(valuesList.subList(startIndex + stepSize, valuesList.size())));
-//			DataSet trainingSet = new DataSet(trainingDataList.size(), featureList, trainingDataList);
-//			trainingSets[i] = trainingSet;
-//		}		
+		System.out.println("Tree before Pruning");
+		this.printTree();
 	}
 	
 	public DecisionTreeNode getRootNode() {

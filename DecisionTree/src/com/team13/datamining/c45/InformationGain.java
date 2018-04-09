@@ -29,6 +29,7 @@ public class InformationGain {
 	public void calculateInformationGainDiscrete(List<Values> valuesList, Feature targetFeature) throws IOException	{
 		this.splitVal = Integer.MIN_VALUE;
 		List<String> featureValues = feature.getFeatureValues();
+		
 		String featureName = feature.getFeatureName();
 		
 		for(String val : featureValues)	{
@@ -38,22 +39,23 @@ public class InformationGain {
 		for(Values value : valuesList)	{
 			Map<String, String> pairs = value.getFeatureValueMap();
 			String featureValue = pairs.get(featureName);
-			ArrayList<Values> subList = this.valuesSubset.get(featureValue);
-			subList.add(value);
-			this.valuesSubset.put(featureValue, subList);
+			valuesSubset.get(featureValue).add(value);
 		}
-		
+	
 		double H_Y = EntropyCalculator.getEntropyValue(valuesList, targetFeature);
 		
+		//System.out.println("H_Y = " + H_Y);
 		double H_X = 0.0;
 		int n = valuesList.size();
 		for(String feat : this.valuesSubset.keySet())	{
-			ArrayList<Values> subList = valuesSubset.get(feat);
+			ArrayList<Values> subList = new ArrayList<>(valuesSubset.get(feat));
 			double H_X_spec = EntropyCalculator.getEntropyValue(subList, targetFeature);
+			//System.out.println("H_X (" + feat + ") = " + H_X_spec);
 			int m = subList.size();
 			H_X = H_X + ((double)m/n) * H_X_spec;
 		}
 		
+		//System.out.println("H_X = " + H_X);
 		this.informationGain = H_Y - H_X;
 	}
 

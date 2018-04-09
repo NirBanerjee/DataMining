@@ -36,4 +36,9 @@ public class Values {
 	public void setRowIndex(int rowIndex) {
 		this.rowIndex = rowIndex;
 	}
+	
+	@Override
+	public String toString()	{
+		return "Index = " + this.rowIndex + " Values = " + this.featureValueMap;
+	}
 }

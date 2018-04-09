@@ -43,6 +43,15 @@ public class EntropyCalculator {
 		
 		for (String key : labelCount.keySet())	{
 			int count = labelCount.get(key);
+			
+			if(count == 0)	{
+				continue;
+			}
+			
+			if(count == datasetSize)	{
+				return 0;
+			}
+			
 			double prob = (double)count / datasetSize;
 			entropy = entropy + prob * Math.log(prob)/Math.log(2);
 		}

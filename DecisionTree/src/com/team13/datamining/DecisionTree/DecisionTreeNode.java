@@ -61,5 +61,11 @@ public class DecisionTreeNode {
 	public void addChild(String valueName, DecisionTreeNode child) {
 		children.put(valueName, child);
 	}
+	
+	@Override
+	public String toString() {
+		if (!this.isLeaf) return "Root feature: " + this.feature.getFeatureName() + "; Children: " + this.children;
+		else return "Leaf label: " + this.targetClass;
+	}
 		
 }

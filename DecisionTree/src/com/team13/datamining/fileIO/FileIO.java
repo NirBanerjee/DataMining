@@ -52,21 +52,18 @@ public class FileIO {
 			throw new IOException();
 		}
 		line = scanner.nextLine();
-		if(!scanner.hasNextLine())	{
-			throw new IOException();
-		}
-		line = scanner.nextLine();
-		
+
 		List<Values> valuesList = new ArrayList<>();
 		int rowIndex = 0;
-		while(scanner.hasNextLine() && line.length() > 0)	{
+		while(scanner.hasNextLine())	{
+			line = scanner.nextLine();
 			String[] lineParts = line.split(",");
 			if(lineParts.length < 3)	{
 				throw new IOException("Input File not in proper Format");
 			}
 			Values value = new Values(rowIndex, lineParts, featureList);
 			valuesList.add(value);
-			line = scanner.nextLine();
+			
 			rowIndex++;
 		}
 		

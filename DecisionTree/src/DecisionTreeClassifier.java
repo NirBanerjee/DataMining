@@ -35,11 +35,11 @@ public class DecisionTreeClassifier {
 		
 		//Process Test File and Obtain Test Data
 		DataSet testSet = fileIO.readFile(testFile);
-		//System.out.println(testSet.getDataSize());
 		
 		//Build Tree using Train Data.
 		DecisionTree dTree = new DecisionTree();
 		dTree.buildDecisionTree(trainingSet);
+		
 		//Use validation data to find optimal height of tree
 		
 		//Predict Train labels after building tree

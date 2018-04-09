@@ -29,7 +29,8 @@ public class DataSet {
 	}
 
 	public List<Feature> getFeatureList() {
-		return new ArrayList<>(featureList);
+		featureList.remove(featureList.size() - 1);
+		return this.featureList;
 	}
 
 	public void setFeatureList(List<Feature> featureList) {

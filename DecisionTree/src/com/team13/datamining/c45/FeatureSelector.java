@@ -36,6 +36,7 @@ public class FeatureSelector {
 				ig.calculateInformationGainDiscrete(valuesList, targetFeature);
 				currentInfoGain = ig.getInformationGain();
 				currentSubset = ig.getValuesSubset();
+				//System.out.println("Infor Gain (" + f.getFeatureName() + ") = " + currentInfoGain );
 			}	else	{
 				ig.calculateInformationGainContinuous(valuesList, targetFeature);
 				currentInfoGain = ig.getInformationGain();
@@ -49,6 +50,14 @@ public class FeatureSelector {
 				this.subset = currentSubset;
 			}
 		}
+	}
+
+	public double getSplitVal() {
+		return splitVal;
+	}
+
+	public void setSplitVal(double splitVal) {
+		this.splitVal = splitVal;
 	}
 
 	public Feature getBestFeature() {

@@ -1,0 +1,15 @@
+@relation test_data
+
+@attribute A1 {0,1}
+@attribute A2 {0,1}
+@attribute A3 {0,1,2}
+@attribute label {0,1}
+
+@data
+1,1,0,0
+1,1,2,1
+1,0,0,1
+1,1,2,1
+0,0,2,0
+0,1,1,0
+0,0,0,0
