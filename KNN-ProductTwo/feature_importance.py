@@ -4,8 +4,6 @@ import matplotlib.pyplot as plt
 import weka.core.converters as converters
 from weka.core.converters import Loader
 import weka.core.jvm as jvm
-
-# from sklearn.datasets import make_classification
 from sklearn.ensemble import ExtraTreesClassifier
 
 def getVector(matrix):
@@ -41,18 +39,10 @@ matrixFour = getVector(initialFour)
 mapFour = {}
 for index in range(len(wordFour)):
     mapFour[wordFour[index]] = matrixFour[index]
-# Build a classification task using 3 informative features
-# X, y = make_classification(n_samples=160,
-#                            n_features=8,
-#                            n_informative=3,
-#                            n_redundant=0,
-#                            n_repeated=0,
-#                            n_classes=2,
-#                            random_state=0,
-#                            shuffle=False)
 jvm.start(class_path=['weka.jar'])
 loader = Loader(classname="weka.core.converters.ArffLoader")
-data = loader.load_file("trainProdIntro.binary.arff")
+train_data_path=input("Please input train data(.arff) path:")
+data = loader.load_file(train_data_path)
 X=[]
 y=[]
 for info in data:
@@ -89,7 +79,6 @@ print("Feature ranking:")
 for f in range(X.shape[1]):
     print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
 
-print(forest.predict(X))
 # Plot the feature importances of the forest
 plt.figure()
 plt.title("Feature importances")
