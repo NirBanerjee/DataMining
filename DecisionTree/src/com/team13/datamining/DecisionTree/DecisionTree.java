@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.team13.datamining.c45.EntropyCalculator;
+import com.team13.datamining.c45.FeatureSelector;
 import com.team13.datamining.datamodels.DataSet;
 import com.team13.datamining.datamodels.Feature;
 import com.team13.datamining.datamodels.Values;
@@ -62,13 +63,15 @@ public class DecisionTree {
 			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
 			return leafNode;
 		}
-		 
-		if (EntropyCalculator.getEntropyValue(valuesList, targetFeature) == 0)	{
+		
+		double H_Y = EntropyCalculator.getEntropyValue(valuesList, targetFeature);
+		if (H_Y == 0)	{
 			String leafClass = valuesList.get(0).getFeatureValueMap().get(targetFeature.getFeatureName());
 			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
 			return leafNode;
 		}
 		
+		FeatureSelector fs = new FeatureSelector(featureList, valuesList, targetFeature);
 		
 		return null;
 	}
