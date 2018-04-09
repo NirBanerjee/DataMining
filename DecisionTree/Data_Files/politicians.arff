@@ -1,0 +1,35 @@
+@relation politicians_data
+
+@attribute A1 {n,y}
+@attribute A2 {n,y}
+@attribute label {republican,democrat}
+
+@data
+n,y,democrat
+n,y,republican
+y,y,democrat
+y,y,democrat
+y,y,democrat
+y,y,democrat
+y,y,democrat
+n,y,republican
+y,y,democrat
+n,n,republican
+y,y,democrat
+n,y,republican
+y,y,democrat
+n,n,republican
+n,y,republican
+n,n,republican
+y,y,democrat
+y,y,democrat
+y,y,democrat
+y,y,democrat
+n,y,democrat
+y,y,democrat
+y,n,republican
+n,n,republican
+n,y,republican
+n,y,republican
+n,y,republican
+n,n,republican
