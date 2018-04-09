@@ -56,7 +56,7 @@ public class DecisionTree {
 		return maxLabel;
 	}
 	
-	private DecisionTreeNode constructTree(List<Feature> featureList, List<Values> valuesList, Feature targetFeature) throws IOException	{
+	private DecisionTreeNode buildTree(List<Feature> featureList, List<Values> valuesList, Feature targetFeature) throws IOException	{
 		
 		if (featureList.size() == 0)	{
 			String leafClass = this.getMajorityClass(valuesList, targetFeature);
@@ -72,8 +72,27 @@ public class DecisionTree {
 		}
 		
 		FeatureSelector fs = new FeatureSelector(featureList, valuesList, targetFeature);
+		Feature feat = fs.getBestFeature();
 		
-		return null;
+		DecisionTreeNode node = new DecisionTreeNode(feat);
+		featureList.remove(feat);
+		
+		HashMap<String, ArrayList<Values>> valueSets = fs.getSubset();
+		for (String val : valueSets.keySet())	{
+			ArrayList<Values> subSet = valueSets.get(val);
+			if (subSet.size() == 0)	{
+				String leafClass = getMajorityClass(valuesList, targetFeature);
+				DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
+				node.addChild(val, leafNode);
+			}	else	{
+				DecisionTreeNode childNode = buildTree(featureList, subSet, targetFeature);
+				node.addChild(val, childNode);
+			}
+		}
+		
+		featureList.add(feat);
+		
+		return node;
 	}
 	
 	public void buildDecisionTree(DataSet dataSet) throws IOException	{
@@ -87,7 +106,7 @@ public class DecisionTree {
 		List<Values> valuesList = dataSet.getValueList();
 		Feature targetFeature = dataSet.getLabelFeature();
 		
-		this.rootNode = this.constructTree(featureList, valuesList, targetFeature);
+		this.rootNode = this.buildTree(featureList, valuesList, targetFeature);
 		
 		//Generate Validation and Test Data.
 //		int stepSize = dataSet.getDataSize() / foldFactor;
@@ -107,4 +126,13 @@ public class DecisionTree {
 //			trainingSets[i] = trainingSet;
 //		}		
 	}
+	
+	public DecisionTreeNode getRootNode() {
+		return rootNode;
+	}
+
+	public void setRootNode(DecisionTreeNode rootNode) {
+		this.rootNode = rootNode;
+	}
+
 }

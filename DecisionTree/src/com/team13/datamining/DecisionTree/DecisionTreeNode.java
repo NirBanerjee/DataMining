@@ -57,5 +57,9 @@ public class DecisionTreeNode {
 	public void setLeaf(boolean isLeaf) {
 		this.isLeaf = isLeaf;
 	}
+	
+	public void addChild(String valueName, DecisionTreeNode child) {
+		children.put(valueName, child);
+	}
 		
 }

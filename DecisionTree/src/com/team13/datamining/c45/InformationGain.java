@@ -2,7 +2,6 @@
  * @author nirmoho-Mac
  *
  */
-
 package com.team13.datamining.c45;
 
 import java.io.IOException;
@@ -14,18 +13,23 @@ import java.util.Map;
 import com.team13.datamining.datamodels.Feature;
 import com.team13.datamining.datamodels.Values;
 
-public class InformationGainDiscrete {
 
-	private double informationGain;
-	private Feature feature;
-	private Map<String, ArrayList<Values>> valuesSubset;
+public class InformationGain {
 	
-	public InformationGainDiscrete(Feature feature, Feature targetFeature, List<Values> valuesList) throws IOException	{
+	private Feature feature;
+	private double informationGain;
+	private HashMap<String, ArrayList<Values>> valuesSubset;
+	private double splitVal;
+	
+	public InformationGain(Feature feature)	{
 		this.feature = feature;
+		this.valuesSubset = new HashMap<>();
+	}
+	
+	public void calculateInformationGainDiscrete(List<Values> valuesList, Feature targetFeature) throws IOException	{
+		this.splitVal = Integer.MIN_VALUE;
 		List<String> featureValues = feature.getFeatureValues();
 		String featureName = feature.getFeatureName();
-		
-		this.valuesSubset = new HashMap<>();
 		
 		for(String val : featureValues)	{
 			this.valuesSubset.put(val, new ArrayList<Values>());
@@ -53,6 +57,10 @@ public class InformationGainDiscrete {
 		this.informationGain = H_Y - H_X;
 	}
 
+	public void calculateInformationGainContinuous(List<Values> valuesList, Feature targetFeature)	{
+		this.splitVal = -1;
+	}
+	
 	public double getInformationGain() {
 		return informationGain;
 	}
@@ -61,19 +69,19 @@ public class InformationGainDiscrete {
 		this.informationGain = informationGain;
 	}
 
-	public Feature getFeature() {
-		return feature;
-	}
-
-	public void setFeature(Feature feature) {
-		this.feature = feature;
-	}
-
-	public Map<String, ArrayList<Values>> getValuesSubset() {
+	public HashMap<String, ArrayList<Values>> getValuesSubset() {
 		return valuesSubset;
 	}
 
-	public void setValuesSubset(Map<String, ArrayList<Values>> valuesSubset) {
+	public void setValuesSubset(HashMap<String, ArrayList<Values>> valuesSubset) {
 		this.valuesSubset = valuesSubset;
+	}
+
+	public double getSplitVal() {
+		return splitVal;
+	}
+
+	public void setSplitVal(double splitVal) {
+		this.splitVal = splitVal;
 	}
 }
