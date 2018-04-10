@@ -70,22 +70,22 @@ def classify_binary(input, matrixone, matrixtwo, labels, k, minVals, maxVals):
     diff[:,3] = diff[:,3] * 3
     squared_diff = diff ** 2
     squared_dist = sum(squared_diff, axis=1)
-    distance=[]
+    similarity=[]
     row=matrixone.shape[0]
-    # calculate distance for non-value
+    # calculate distance for non-value and append similarity for each one
     for index in range(row):
         cur = 1 - initialOne[matrixone[index][0]][inputone[0]] + 1 - initialTwo[matrixone[index][1]][inputone[1]] + 1 - initialThree[matrixone[index][2]][inputone[2]] + 1 - initialFour[matrixone[index][3]][inputone[3]]
         # total distance for one row
         cur += squared_dist[index]
         cur = cur ** 0.5
-        distance.append(cur)
-    # sort the distance
-    sorted_dist_index = argsort(distance)
+        similarity.append(1/cur)
+    # sort the similarity
+    sorted_similarity_index = argsort(similarity)[::-1]
 
     count = {}
     for i in range(k):
         # choose the min k distance
-        vote_label = labels[sorted_dist_index[i]]
+        vote_label = labels[sorted_similarity_index[i]]
         # count the times labels occur
         count[vote_label] = count.get(vote_label, 0) + 1
 
@@ -119,6 +119,7 @@ def cross_valiadation_binary(train_data, fold):
     test_num=int(len(dataset)/fold)
     print("Starting Cross Validation, # of fold is "+str(fold))
     index=1
+    sum=0
     for i in range(0, len(dataset), test_num):
         print("Cross Validation #" + str(index) + ":")
         print("Test data index: " + str(i) + "--" + str(i + test_num))
@@ -138,8 +139,12 @@ def cross_valiadation_binary(train_data, fold):
             res = classify_binary(b, matrixone, matrixtwo, label, 5, minVals, maxVals)
             if (actual == res):
                 count+=1
+        sum+=count/total
         print("Accuracy is: "+str(count/total))
         index+=1
+        cv_test=[]
+        cv_train=[]
+    print("Average accuracy is: "+str(sum/fold))
 
 def classify_real(input, matrixone, matrixtwo, labels, k, minVals, maxVals):
     inputone, inputtwo = tranfer(input)
@@ -155,19 +160,19 @@ def classify_real(input, matrixone, matrixtwo, labels, k, minVals, maxVals):
     diff[:,3] = diff[:,3] * 3
     squared_diff = diff ** 2
     squared_dist = sum(squared_diff, axis=1)
-    distance=[]
+    similarity=[]
     row=matrixone.shape[0]
     for index in range(row):
         cur = 1 - initialOne[matrixone[index][0]][inputone[0]] + 1 - initialTwo[matrixone[index][1]][inputone[1]] + 1 - initialThree[matrixone[index][2]][inputone[2]] + 1 - initialFour[matrixone[index][3]][inputone[3]]
         cur += squared_dist[index]
         cur = cur ** 0.5
-        distance.append(cur)
-    # sort the distance
-    sortedDistIndices = argsort(distance)
+        similarity.append(1/cur)
+    # sort the similarity
+    sorted_similarity_index = argsort(similarity)[::-1]
 
     ksum=0
     for i in range(k):
-        ksum += float(labels[sortedDistIndices[i]])
+        ksum += float(labels[sorted_similarity_index[i]])
 
     return ksum / k
 
@@ -191,6 +196,7 @@ def cross_valiadation_real(train_data, fold):
     test_num=int(len(dataset)/fold)
     print("Starting Cross Validation, # of fold is "+str(fold))
     index=1
+    sum=0
     for i in range(0, len(dataset), test_num):
         real = []
         predict = []
@@ -212,8 +218,12 @@ def cross_valiadation_real(train_data, fold):
             predict.append(res)
         real = array(real)
         predict = array(predict)
+        sum+=((real - predict) ** 2).mean(axis=None)
         print("MSE is: "+str(((real - predict) ** 2).mean(axis=None)))
         index+=1
+        cv_test=[]
+        cv_train=[]
+    print("Average MSE is: "+str(sum/fold))
 
 if __name__ == '__main__':
     # initial symbol transfer by using similarity matrix
