@@ -138,6 +138,8 @@ public class DecisionTree {
 		
 		System.out.println("Tree before Pruning");
 		this.printTree();
+		
+		//Add method for prediction and printing to file
 	}
 	
 	public DecisionTreeNode getRootNode() {

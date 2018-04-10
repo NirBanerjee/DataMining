@@ -59,9 +59,6 @@ public class InformationGain {
 		this.informationGain = H_Y - H_X;
 	}
 
-	public void calculateInformationGainContinuous(List<Values> valuesList, Feature targetFeature)	{
-		this.splitVal = -1;
-	}
 	
 	public double getInformationGain() {
 		return informationGain;
