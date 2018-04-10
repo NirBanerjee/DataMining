@@ -38,7 +38,7 @@ public class FeatureSelector {
 				currentSubset = ig.getValuesSubset();
 				//System.out.println("Infor Gain (" + f.getFeatureName() + ") = " + currentInfoGain );
 			}	else	{
-				//ig.calculateInformationGainContinuous(valuesList, targetFeature);
+				ig.calculateInformationGainContinuous(valuesList, targetFeature);
 				currentInfoGain = ig.getInformationGain();
 				currentSubset = ig.getValuesSubset();
 				this.splitVal = ig.getSplitVal();

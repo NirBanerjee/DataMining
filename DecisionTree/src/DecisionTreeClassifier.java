@@ -39,6 +39,7 @@ public class DecisionTreeClassifier {
 		//Build Tree using Train Data.
 		DecisionTree dTree = new DecisionTree();
 		dTree.buildDecisionTree(trainingSet);
+		FileIO.printToFile(printTreeFile, dTree.getTreeToPrint());
 		
 		//Use validation data to find optimal height of tree
 		

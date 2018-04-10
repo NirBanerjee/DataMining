@@ -19,9 +19,11 @@ import com.team13.datamining.datamodels.Values;
 public class DecisionTree {
 	
 	private DecisionTreeNode rootNode;
+	private List<String> treeToPrint;
 	
 	public void DecisionTreeNode()	{
 		this.rootNode = null;
+		this.treeToPrint = null;
 	}
 	
 	private void printTreeUtil(DecisionTreeNode root, StringBuilder sb, ArrayList<String> finalStr)	{
@@ -49,10 +51,7 @@ public class DecisionTree {
 		StringBuilder sb = new StringBuilder();
 		DecisionTreeNode tempNode = this.rootNode;
 		printTreeUtil(tempNode, sb, finalStr);
-		
-		for (String str : finalStr)	{
-			System.out.println(str);
-		}
+		this.treeToPrint = new ArrayList<>(finalStr);
 	}
 	
 	private String getMajorityClass(List<Values> valuesList, Feature feature) throws IOException	{
@@ -149,5 +148,12 @@ public class DecisionTree {
 	public void setRootNode(DecisionTreeNode rootNode) {
 		this.rootNode = rootNode;
 	}
+	
+	public List<String> getTreeToPrint() {
+		return treeToPrint;
+	}
 
+	public void setTreeToPrint(List<String> treeToPrint) {
+		this.treeToPrint = treeToPrint;
+	}
 }

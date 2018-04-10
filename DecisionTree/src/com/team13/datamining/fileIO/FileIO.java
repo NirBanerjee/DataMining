@@ -1,5 +1,6 @@
 package com.team13.datamining.fileIO;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -73,11 +74,14 @@ public class FileIO {
 		return dataset;
 	}
 	
-	public void printToFile(String fileName, String[] linesToPrint) throws IOException		{
+	public static void printToFile(String fileName, List<String> linesToPrint) throws IOException		{
 		FileWriter fileWriter = new FileWriter(fileName);
+		BufferedWriter bw = new BufferedWriter(fileWriter);
 		for (String line : linesToPrint)	{
-			fileWriter.write(line);
+			bw.write(line);
+			System.out.println(line);
 		}
+		bw.close();
 		fileWriter.close();
 	}
 
