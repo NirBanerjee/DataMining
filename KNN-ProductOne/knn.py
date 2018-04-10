@@ -1,6 +1,7 @@
 import csv
 import numpy as np
 import math
+import sys
 
 TYPE_MATRIX = np.linalg.eig(np.diag((1,2,3,4,5)))[1]
 LIFE_STYLE_MATRIX = np.linalg.eig(np.diag((1,2,3,4)))[1]
@@ -16,6 +17,7 @@ def read_dataset(path):
         reader = list(csv.reader(data_file))
         data_cat = {}
         data_cat_count = 0
+        attr_count = 0
         data = []
         label = []
         for row in reader:
@@ -23,6 +25,7 @@ def read_dataset(path):
                 continue
             if str(row[0]).startswith('@attribute'):
                 # Attribute list
+                attr_count = attr_count + 1
                 if not str(row[0]).endswith(' real'):
                     subcat = {}
                     count = 1
@@ -56,7 +59,7 @@ def read_dataset(path):
         data = data/np.linalg.norm(data,ord=np.inf,axis=0,keepdims=True)
         data[:,0] = original_data[:,0]
         data[:,1] = original_data[:,1]
-        return [data,label]
+        return [data,label,attr_count - 1]
 
 
 def calcEuclidean(test_row, train_row,weight_vector):
@@ -182,6 +185,7 @@ def knn_classifier(train_data,train_label,test_data,k,wv=None,vote_method=1,dist
         votes = {}
         similarity_list = []
         for train_row in train_data:
+            similarity = 0.0
             if distance_method == 1:
                 similarity = 1 / calcEuclidean(test_row, train_row,weight_vector)
             elif distance_method == 2:
@@ -295,20 +299,23 @@ def weight_optimization(data,folds,num_of_attr, k):
     return weight_vector,accuracy
 
 
-def knn():
+def knn(train_data_path='data/trainProdSelection.arff', test_data_path='data/testProdSelection.arff', k=3, cross_val_folds=5):
 
-    k = 3
-    cross_val_folds = 5
-    num_of_attr = 6
+    # k = 3
+    # cross_val_folds = 5
+
     # read training data file
-    train_data_list = read_dataset('data/trainProdSelection.arff')
+    train_data_list = read_dataset(train_data_path)
     train_data = np.asarray(train_data_list[0])
     train_label = np.asarray(train_data_list[1])
+    num_of_attr = train_data_list[2]
     train_data_label = np.hstack((np.asarray(train_data),np.vstack(train_label)))
     # print(train_data_label)
 
-    # read testing data file -- using Frobenius norm, try and change back to min-max
-    test_data_list = read_dataset('data/testProdSelection.arff')
+    # print(num_of_attr)
+
+    #read testing data file -- using Frobenius norm, try and change back to min-max
+    test_data_list = read_dataset(test_data_path)
     test_data = np.asarray(test_data_list[0])
 
     # print(knn_classifier(train_data,train_label,test_data,k))
@@ -326,7 +333,7 @@ def knn():
         if epoch > 100:
             break
         print("epoch: {}".format(epoch))
-        weight_vector,accuracy = weight_optimization(train_data_label,cross_val_folds,num_of_attr,k)
+        weight_vector,accuracy = weight_optimization(train_data_label, cross_val_folds, num_of_attr, k)
         print("weight_vector: {}".format(weight_vector))
         print("highest accuracy: {}".format(accuracy))
 
@@ -365,4 +372,28 @@ def knn():
 if __name__ != '__main__':
     pass
 
-knn()
+if len(sys.argv) != 4:
+    print("Please provide the following parameters: ")
+    print("=========================================")
+    print("1. num of k \t\t-- \tk nearest-neighbours ")
+    print("2. number of folds \t-- \tnumber of folds for cross validation")
+    print("3. train data path \t-- \tpath for training dataset")
+    print("4. test data path \t-- \tpath for testing dataset")
+    print("=========================================")
+    exit(1)
+
+try:
+    k = int(sys.argv[0])
+    cross_val_folds = int(sys.argv[1])
+    train_data_path = sys.argv[2]
+    test_data_path = sys.argv[3]
+    knn(train_data_path,test_data_path,k,cross_val_folds)
+except:
+    print("Please provide the following parameters: ")
+    print("=========================================")
+    print("1. num of k \t\t-- \tk nearest-neighbours ")
+    print("2. number of folds \t-- \tnumber of folds for cross validation")
+    print("3. train data path \t-- \tpath for training dataset")
+    print("4. test data path \t-- \tpath for testing dataset")
+    print("=========================================")
+    exit(1)
