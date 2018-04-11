@@ -14,7 +14,7 @@ import com.team13.datamining.datamodels.Values;
 
 public class FileIO {
 	
-	public DataSet readFile(String fileName) throws IOException	{
+	public static DataSet readFile(String fileName) throws IOException	{
 		
 		File file = new File(fileName);
 		@SuppressWarnings("resource")

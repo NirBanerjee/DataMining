@@ -6,6 +6,7 @@ package com.team13.datamining.DecisionTree;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,7 @@ import com.team13.datamining.c45.FeatureSelector;
 import com.team13.datamining.datamodels.DataSet;
 import com.team13.datamining.datamodels.Feature;
 import com.team13.datamining.datamodels.Values;
+import com.team13.datamining.fileIO.FileIO;
 
 public class DecisionTree {
 	
@@ -124,6 +126,7 @@ public class DecisionTree {
 		double accuracy = 100 * (double)total / L1.size();
 		return accuracy;
 	}
+	
 	private String getMajorityClass(List<Values> valuesList, Feature feature) throws IOException	{
 		
 		List<String> valuesofTarget = new ArrayList<>(feature.getFeatureValues());
@@ -156,9 +159,9 @@ public class DecisionTree {
 		return maxLabel;
 	}
 	
-	private DecisionTreeNode buildTree(List<Feature> featureList, List<Values> valuesList, Feature targetFeature) throws IOException	{
+	private DecisionTreeNode buildTree(List<Feature> featureList, List<Values> valuesList, Feature targetFeature, int level) throws IOException	{
 		
-		if (featureList.size() == 0)	{
+		if (featureList.size() == 0 || level == 1)	{
 			String leafClass = this.getMajorityClass(valuesList, targetFeature);
 			DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
 			return leafNode;
@@ -187,7 +190,7 @@ public class DecisionTree {
 				DecisionTreeNode leafNode = new DecisionTreeNode(leafClass);
 				node.addChild(val, leafNode);
 			}	else	{
-				DecisionTreeNode childNode = buildTree(featureList, subSet, targetFeature);
+				DecisionTreeNode childNode = buildTree(featureList, subSet, targetFeature, level-1);
 				node.addChild(val, childNode);
 			}
 		}
@@ -197,36 +200,122 @@ public class DecisionTree {
 		return node;
 	}
 	
-	public void treeOperations(DataSet dataSet, DataSet testSet) throws IOException	{
+	public void treeOperations(String[] args) throws IOException	{
 		
-		List<Feature> featureList = dataSet.getFeatureList();
-		List<Values> valuesList = dataSet.getValueList();
-		Feature targetFeature = dataSet.getLabelFeature();
+		String trainFile = args[0];
+		String testFile = args[1];
+		String trainPredictionsFile = args[2];
+		String testPredictionsFile = args[3];
+		String metricsFile = args[4];
+		String printTreeFile = args[5];
+		
+		DataSet trainSet = FileIO.readFile(trainFile);
+		DataSet testSet = FileIO.readFile(testFile);
+		
+		
+		//Shuffle the data
+		int foldFactor = 15;
+		
+		List<Feature> featureList = trainSet.getFeatureList();
+		Feature targetFeature = trainSet.getLabelFeature();
+		List<Values> valuesList = trainSet.getValueList();
+		
+		int featureNum = featureList.size();		
+		
+		int stepSize = trainSet.getDataSize() / foldFactor;
+		Collections.shuffle(valuesList);
+		
+		List<String> metricsList = new ArrayList<>();
+		double maxAccuracy = 0.0;
+		int optimalLevel = 0;
+		for (int i = 0; i < featureNum; i++)	{
+			DataSet[] validationSets = new DataSet[foldFactor];	
+			DataSet[] trainingSets = new DataSet[foldFactor];
+			double validationAccuracy = 0.0;
+			int startIndex = 0;
+			
+			
+			for (int j = 0; j < foldFactor; j++)	{
+				List<Values> validationDataList = new ArrayList<>(valuesList.subList(startIndex, startIndex + stepSize));
+				DataSet validationSet = new DataSet(validationDataList.size(), featureList, validationDataList);
+				validationSets[j] = validationSet;
+				
+				List<Values> trainingDataList = new ArrayList<>();
+				if(startIndex != 0)	{
+					trainingDataList = new ArrayList<>(valuesList.subList(0, startIndex));
+				}
+				trainingDataList.addAll(new ArrayList<>(valuesList.subList(startIndex + stepSize, valuesList.size())));
+				DataSet trainingSubSet = new DataSet(trainingDataList.size(), featureList, trainingDataList);
+				trainingSets[j] = trainingSubSet;
+				startIndex = startIndex + stepSize;
+			}
+			
+			for (int j = 0; j < foldFactor; j++)	{
+				this.rootNode = null;
+				
+				List<Values> trainingValueList = trainingSets[j].getValueList();
+				List<Values> validationValueList = validationSets[j].getValueList();
+				List <String> labelList = new ArrayList<>();
+				for (int k = 0; k < validationValueList.size(); k++)	{
+					labelList.add(validationValueList.get(k).getTargetValue());
+				}
+				
+				this.rootNode = this.buildTree(featureList, trainingValueList, targetFeature, (i+1));
+				List <String> predictList = new ArrayList<>();
+				predictList = this.predict(validationValueList);
+				
+				double accuracy = this.calculateAccuracy(predictList, labelList);
+				validationAccuracy = validationAccuracy + accuracy;
+			}
+			validationAccuracy = validationAccuracy / foldFactor;
+			if (validationAccuracy > maxAccuracy)	{
+				maxAccuracy = validationAccuracy;
+				optimalLevel = i + 1;
+			}
+		}
+		
+		
+		//Build Tree with optimal height
+		this.rootNode = null;
+		valuesList = trainSet.getValueList();
+		Collections.shuffle(valuesList);
+		List<Values> valuesListCopy = new ArrayList<>(valuesList);
 		List <String> labelList = new ArrayList<>();
-		for (int i=0; i < valuesList.size(); i++)	{
-			labelList.add(valuesList.get(i).getTargetValue());
+		for (int k = 0; k < valuesList.size(); k++)	{
+			labelList.add(valuesList.get(k).getTargetValue());
 		}
 		
-		this.rootNode = this.buildTree(featureList, valuesList, targetFeature);
+		this.rootNode = this.buildTree(featureList, valuesList, targetFeature, optimalLevel);
 		
-		this.printTree();
-		List<Values> valuesListNew = dataSet.getValueList();
-		
+		String line = "K folds selected => " + foldFactor;
+		metricsList.add(line);
+	
+		//Predict Training Labels
 		List <String> predictList = new ArrayList<>();
-		predictList = this.predict(valuesListNew);
+		predictList = this.predict(valuesListCopy);
+		double fullAccuracy = this.calculateAccuracy(predictList, labelList);
+		line = "Training Accuracy => " + fullAccuracy;
+		metricsList.add(line);
+		line = "Cross Validation Accuracy => " + maxAccuracy;
+		metricsList.add(line);
 		
-		double accuracy = this.calculateAccuracy(predictList, labelList);
-		System.out.println(accuracy);
-		//List<Feature> featureListTest = testSet.getFeatureList();
-		List<Values> valuesListTest = testSet.getValueList();
+		//Predict Test Labels
+		List<Values> testValuesList = testSet.getValueList();
+		List <String> testPredictList = new ArrayList<>();
+		testPredictList = this.predict(testValuesList);
 		
-		List <String> predictListTest = new ArrayList<>();
-		predictListTest = this.predict(valuesListTest);
+		//Print Tree to File
+		this.printTree();
+		FileIO.printToFile(printTreeFile, this.treeToPrint);
 		
-		for (String labelTest : predictListTest)	{
-			System.out.println(labelTest);
-		}
+		//Print Prediction Labels to File
+		FileIO.printToFile(trainPredictionsFile, predictList);
 		
+		//Print Test prediction labels to File
+		FileIO.printToFile(testPredictionsFile, testPredictList);
+		
+		//Print metrics to file
+		FileIO.printToFile(metricsFile, metricsList);
 	}
 	
 	public DecisionTreeNode getRootNode() {
