@@ -274,7 +274,7 @@ public class DecisionTree {
 			}
 		}
 		
-		
+		System.out.println("Completed Cross Validation.....");
 		//Build Tree with optimal height
 		this.rootNode = null;
 		valuesList = trainSet.getValueList();
@@ -289,7 +289,7 @@ public class DecisionTree {
 		
 		String line = "K folds selected => " + foldFactor;
 		metricsList.add(line);
-	
+		System.out.println("Final Decision Tree Built.....");
 		//Predict Training Labels
 		List <String> predictList = new ArrayList<>();
 		predictList = this.predict(valuesListCopy);
@@ -307,15 +307,19 @@ public class DecisionTree {
 		//Print Tree to File
 		this.printTree();
 		FileIO.printToFile(printTreeFile, this.treeToPrint);
+		System.out.println("Decision Tree printed to file - " + printTreeFile);
 		
 		//Print Prediction Labels to File
 		FileIO.printToFile(trainPredictionsFile, predictList);
+		System.out.println("Predictions on training data file printed to - " + trainPredictionsFile);
 		
 		//Print Test prediction labels to File
 		FileIO.printToFile(testPredictionsFile, testPredictList);
+		System.out.println("Predictions on test data file printed to - " + testPredictionsFile);
 		
 		//Print metrics to file
 		FileIO.printToFile(metricsFile, metricsList);
+		System.out.println("Process metric printed to - " + metricsFile);
 	}
 	
 	public DecisionTreeNode getRootNode() {
