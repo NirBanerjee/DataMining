@@ -64,7 +64,6 @@ public class FileIO {
 			}
 			Values value = new Values(rowIndex, lineParts, featureList);
 			valuesList.add(value);
-			
 			rowIndex++;
 		}
 		
@@ -79,7 +78,7 @@ public class FileIO {
 		BufferedWriter bw = new BufferedWriter(fileWriter);
 		for (String line : linesToPrint)	{
 			bw.write(line);
-			System.out.println(line);
+			bw.write("\n");
 		}
 		bw.close();
 		fileWriter.close();

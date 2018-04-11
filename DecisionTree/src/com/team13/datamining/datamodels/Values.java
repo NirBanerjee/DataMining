@@ -11,6 +11,7 @@ import java.util.Map;
 public class Values {
 	
 	private Map<String, String> featureValueMap;
+	private String targetValue;
 	private int rowIndex;
 	
 	public Map<String, String> getFeatureValueMap() {
@@ -27,6 +28,16 @@ public class Values {
 		for(int i = 0; i < lineParts.length; i++)	{
 			featureValueMap.put(featureList.get(i).getFeatureName(), lineParts[i]);
 		}
+
+		this.targetValue = lineParts[lineParts.length - 1];
+	}
+
+	public String getTargetValue() {
+		return targetValue;
+	}
+
+	public void setTargetValue(String targetValue) {
+		this.targetValue = targetValue;
 	}
 
 	public int getRowIndex() {
@@ -41,4 +52,5 @@ public class Values {
 	public String toString()	{
 		return "Index = " + this.rowIndex + " Values = " + this.featureValueMap;
 	}
+
 }

@@ -112,8 +112,8 @@ public class InformationGain {
 		for (int i = bestPos + 1; i < valuesList.size(); i++) {
 			right.add(valuesList.get(i));
 		}
-		String leftName = "Less Than " + this.splitVal;
-		String rightName = "More Than " + this.splitVal;
+		String leftName = "Less Than:" + this.splitVal;
+		String rightName = "More Than:" + this.splitVal;
 		this.valuesSubset.put(leftName, left);
 		this.valuesSubset.put(rightName, right);
 		

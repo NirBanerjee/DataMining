@@ -38,7 +38,13 @@ public class DataSet {
 	}
 
 	public List<Values> getValueList() {
-		return new ArrayList<>(valueList);
+		List<Values> retList = new ArrayList<>();
+		
+		for(Values val : this.valueList)	{
+			retList.add(val);
+		}
+		
+		return retList;
 	}
 
 	public void setValueList(List<Values> valueList) {

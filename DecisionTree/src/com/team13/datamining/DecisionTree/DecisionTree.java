@@ -26,6 +26,64 @@ public class DecisionTree {
 		this.treeToPrint = null;
 	}
 	
+	private String predictRow(Values val, DecisionTreeNode currentNode)	{
+		String label = "";
+		
+		if(currentNode.isLeaf())	{
+			return currentNode.getTargetClass();
+		}
+		
+		Feature splitFeature = currentNode.getFeature();
+		
+		if(splitFeature.getFeatureType().equals("discrete"))	{
+			String featVal = val.getFeatureValueMap().get(splitFeature.getFeatureName());
+			for (String key : currentNode.getChildren().keySet())	{
+				if(featVal.equals(key))	{
+					DecisionTreeNode nextNode = currentNode.getChildren().get(key);
+					label = predictRow(val, nextNode);
+				}
+			}
+		}	else	{
+			String featVal = val.getFeatureValueMap().get(splitFeature.getFeatureName());
+			HashMap<String, DecisionTreeNode>hm = currentNode.getChildren();
+			String keyS = "";
+			for (String key : hm.keySet())	{
+				keyS = key;
+				break;
+			}
+			String[] parts = keyS.split(":");
+			double splitVal = Double.parseDouble(parts[1]);
+			
+			if(Double.parseDouble(featVal) > splitVal)	{
+				for(String key : hm.keySet())	{
+					if(key.startsWith("More"))	{
+						DecisionTreeNode nextNode = currentNode.getChildren().get(key);
+						label = predictRow(val, nextNode);
+					}
+				}
+			}	else		{
+				for(String key : hm.keySet())	{
+					if(key.startsWith("Less"))	{
+						DecisionTreeNode nextNode = currentNode.getChildren().get(key);
+						label = predictRow(val, nextNode);
+					}
+				}
+			}
+		}
+		
+		//System.out.println(label);
+		return label;
+	}
+	private List<String> predict(List<Values> valuesList)	{
+		
+		List<String> result = new ArrayList<>();
+		for (Values val : valuesList)	{
+			DecisionTreeNode tempNode = this.rootNode;
+			result.add(this.predictRow(val, tempNode));
+		}
+		return result;
+		
+	}
 	private void printTreeUtil(DecisionTreeNode root, StringBuilder sb, ArrayList<String> finalStr)	{
 		
 		if(root.isLeaf())	{
@@ -54,6 +112,18 @@ public class DecisionTree {
 		this.treeToPrint = new ArrayList<>(finalStr);
 	}
 	
+	private double calculateAccuracy(List<String> L1, List<String> L2)	{
+		int total = 0;
+		
+		for (int i=0; i < L1.size(); i++)	{
+			if(L1.get(i).equals(L2.get(i)))	{
+				total ++;
+			}
+		}
+		
+		double accuracy = 100 * (double)total / L1.size();
+		return accuracy;
+	}
 	private String getMajorityClass(List<Values> valuesList, Feature feature) throws IOException	{
 		
 		List<String> valuesofTarget = new ArrayList<>(feature.getFeatureValues());
@@ -127,18 +197,36 @@ public class DecisionTree {
 		return node;
 	}
 	
-	public void buildDecisionTree(DataSet dataSet) throws IOException	{
+	public void treeOperations(DataSet dataSet, DataSet testSet) throws IOException	{
 		
 		List<Feature> featureList = dataSet.getFeatureList();
 		List<Values> valuesList = dataSet.getValueList();
 		Feature targetFeature = dataSet.getLabelFeature();
+		List <String> labelList = new ArrayList<>();
+		for (int i=0; i < valuesList.size(); i++)	{
+			labelList.add(valuesList.get(i).getTargetValue());
+		}
 		
 		this.rootNode = this.buildTree(featureList, valuesList, targetFeature);
 		
-		System.out.println("Tree before Pruning");
 		this.printTree();
+		List<Values> valuesListNew = dataSet.getValueList();
 		
-		//Add method for prediction and printing to file
+		List <String> predictList = new ArrayList<>();
+		predictList = this.predict(valuesListNew);
+		
+		double accuracy = this.calculateAccuracy(predictList, labelList);
+		System.out.println(accuracy);
+		//List<Feature> featureListTest = testSet.getFeatureList();
+		List<Values> valuesListTest = testSet.getValueList();
+		
+		List <String> predictListTest = new ArrayList<>();
+		predictListTest = this.predict(valuesListTest);
+		
+		for (String labelTest : predictListTest)	{
+			System.out.println(labelTest);
+		}
+		
 	}
 	
 	public DecisionTreeNode getRootNode() {
