@@ -4,8 +4,7 @@ This solution is an implmentation of the concept of Decision Trees for classific
 ## Configurations
 The program is implemented using Java 1.8 and no external libraries were used. At this point of time, the solution only accepts .arff files as input. It will be generalized later to accept input from other file formats.
 ## Executing the solution
-To run the KNN script, simply pass hyperparameters like the number of k, the number of folds for cross validation, the path to the training dataset, and the path to the testing dataset.
-For example(assume the data files are in the data directory):
+To run the decision tree classifier, extract the code bundle. The main project directory is called Decision Trees. Inside the Decision Trees directory, the code files are present inside the src folder. To execute the solution navigate to the src folder in your terminal. The file DecisionTreeClassifier.java is the file that needs to be executed. First step would be to compile the file. Use the command below to compile the file.
 ```
-python3 knn.py 3 5 data/train.arff data/test.arff
+javac DecisionTreeClassifier.java
 ```
