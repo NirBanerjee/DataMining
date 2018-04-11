@@ -214,7 +214,7 @@ public class DecisionTree {
 		
 		
 		//Shuffle the data
-		int foldFactor = 15;
+		int foldFactor = 5;
 		
 		List<Feature> featureList = trainSet.getFeatureList();
 		Feature targetFeature = trainSet.getLabelFeature();
