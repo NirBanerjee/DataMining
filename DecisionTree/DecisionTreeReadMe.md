@@ -8,3 +8,7 @@ To run the decision tree classifier, extract the code bundle. The main project d
 ```
 javac DecisionTreeClassifier.java
 ```
+Once the DecisionTreeClassifier.java file is compiled, the next step would be to execute the code. While executing the code, we pass the training data file, testing data file and the files where we print the output as command line arguments. 
+```
+java DecisionTreeClassifier <path to training data file> <path to test data file> <file to print predictions on training data> <file to print predictions of the test data> <file to print metrics> <file to print the decision tree>
+```
