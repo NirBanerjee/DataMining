@@ -23,5 +23,5 @@
 	2. For label prediction, real value of each line will be shown one by one
 
 ## Appendix
-1. Weight factor of each attributes is hard-code in file. The way to tune them is firstly run "feature\_importance.py" to see importance distribution for these attributes, and then use this proportion as base and try to tune more manually.
+1. Weight factor of each attributes is hard-code in file. Just tune them manually.
 2. Similarity matrix is hard-code in file.
