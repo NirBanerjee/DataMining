@@ -12,3 +12,12 @@ Once the DecisionTreeClassifier.java file is compiled, the next step would be to
 ```
 java DecisionTreeClassifier <path to training data file> <path to test data file> <file to print predictions on training data> <file to print predictions of the test data> <file to print metrics> <file to print the decision tree>
 ```
+For instance, if the training file is inputTrain.arff, test data file is inputTest.arff, the file to print predictions on the training data is printTrainLabels.txt, the file to print predictions on the test data is printTestLabels.txt, the file to print the metrics is metrics.txt and the file to print the decision tree is printTree.txt, then the command to be executed is as below.
+```
+java DecisionTreeClassifier inputTrain.arff  inputTest.arff printTrainLabels.txt printTestLabels.txt metrics.txt printTree.txt
+```
+Please note the path to the input training and test data files can either be absolute paths to the files or the path has to be relative to the directory where the DecisionTreeClassifier.java is present.
+## Limitations
+1. At this point of time, the solution only supports .arff files.
+2. At this point of time, the solution does not validate if the structure of the training and testing file are same. It assumes that the training and test file structure (i.e. the attributes) are same.
+3. The solution at this point of time does not handle missing values.
