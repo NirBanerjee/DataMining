@@ -1,4 +1,5 @@
 /**
+ * Object to store each row of data.
  * @author nirmoho-Mac
  *
  */
@@ -9,19 +10,41 @@ import java.util.Map;
 
 
 public class Values {
-	
+	/**
+	 * HashMap to store feature and value pair.
+	 */
 	private Map<String, String> featureValueMap;
+	/**
+	 * Label for the row.
+	 */
 	private String targetValue;
+	/**
+	 * row index in the file.
+	 */
 	private int rowIndex;
 	
+	/**
+	 * Getter for feature Value map
+	 * @return
+	 */
 	public Map<String, String> getFeatureValueMap() {
 		return featureValueMap;
 	}
-
+	
+	/**
+	 * Setter for feature value map.
+	 * @param featureValueMap
+	 */
 	public void setFeatureValueMap(Map<String, String> featureValueMap) {
 		this.featureValueMap = featureValueMap;
 	}
 
+	/**
+	 * Parameterized constructor.
+	 * @param rowIndex
+	 * @param lineParts
+	 * @param featureList
+	 */
 	public Values(int rowIndex, String[] lineParts, List<Feature> featureList)	{
 		this.rowIndex = rowIndex;
 		featureValueMap = new HashMap<>();

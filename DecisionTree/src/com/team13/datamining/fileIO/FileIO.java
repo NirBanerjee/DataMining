@@ -14,6 +14,12 @@ import com.team13.datamining.datamodels.Values;
 
 public class FileIO {
 	
+	/**
+	 * Method to read arff files
+	 * @param fileName
+	 * @return
+	 * @throws IOException
+	 */
 	public static DataSet readFile(String fileName) throws IOException	{
 		
 		File file = new File(fileName);
@@ -73,6 +79,12 @@ public class FileIO {
 		return dataset;
 	}
 	
+	/**
+	 * Method to write data to file.
+	 * @param fileName
+	 * @param linesToPrint
+	 * @throws IOException
+	 */
 	public static void printToFile(String fileName, List<String> linesToPrint) throws IOException		{
 		FileWriter fileWriter = new FileWriter(fileName);
 		BufferedWriter bw = new BufferedWriter(fileWriter);

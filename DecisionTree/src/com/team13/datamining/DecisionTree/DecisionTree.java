@@ -1,4 +1,5 @@
 /**
+ * Class to code decision tree operations.
  * @author nirmoho-Mac
  *
  */
@@ -19,15 +20,26 @@ import com.team13.datamining.datamodels.Values;
 import com.team13.datamining.fileIO.FileIO;
 
 public class DecisionTree {
-	
+	/**
+	 * Decision Node to hold root.
+	 */
 	private DecisionTreeNode rootNode;
 	private List<String> treeToPrint;
 	
+	/**
+	 * Default Constructor.
+	 */
 	public void DecisionTreeNode()	{
 		this.rootNode = null;
 		this.treeToPrint = null;
 	}
 	
+	/**
+	 * Method to predict for each row of the test file.
+	 * @param val
+	 * @param currentNode
+	 * @return predicted label.
+	 */
 	private String predictRow(Values val, DecisionTreeNode currentNode)	{
 		String label = "";
 		
@@ -76,6 +88,12 @@ public class DecisionTree {
 		//System.out.println(label);
 		return label;
 	}
+	
+	/**
+	 * Driver method to predict label from test file.
+	 * @param valuesList
+	 * @return
+	 */
 	private List<String> predict(List<Values> valuesList)	{
 		
 		List<String> result = new ArrayList<>();
@@ -86,6 +104,13 @@ public class DecisionTree {
 		return result;
 		
 	}
+	
+	/**
+	 * Method to print DFS Traversal of the tree.
+	 * @param root
+	 * @param sb
+	 * @param finalStr
+	 */
 	private void printTreeUtil(DecisionTreeNode root, StringBuilder sb, ArrayList<String> finalStr)	{
 		
 		if(root.isLeaf())	{
@@ -106,6 +131,9 @@ public class DecisionTree {
 		}
 	}
 
+	/**
+	 * Driver method to print the decision tree.
+	 */
 	private void printTree() {
 		ArrayList<String> finalStr = new ArrayList<String>();
 		StringBuilder sb = new StringBuilder();
@@ -114,6 +142,12 @@ public class DecisionTree {
 		this.treeToPrint = new ArrayList<>(finalStr);
 	}
 	
+	/**
+	 * Method to calculate accuracy of prediction
+	 * @param L1 - Actual Label
+	 * @param L2 - Predicted labels
+	 * @return accuracy.
+	 */
 	private double calculateAccuracy(List<String> L1, List<String> L2)	{
 		int total = 0;
 		
@@ -127,6 +161,13 @@ public class DecisionTree {
 		return accuracy;
 	}
 	
+	/**
+	 * Get Majority vote classfier
+	 * @param valuesList
+	 * @param feature
+	 * @return
+	 * @throws IOException
+	 */
 	private String getMajorityClass(List<Values> valuesList, Feature feature) throws IOException	{
 		
 		List<String> valuesofTarget = new ArrayList<>(feature.getFeatureValues());
@@ -159,6 +200,15 @@ public class DecisionTree {
 		return maxLabel;
 	}
 	
+	/**
+	 * Recursive method to build tree.
+	 * @param featureList
+	 * @param valuesList
+	 * @param targetFeature
+	 * @param level
+	 * @return
+	 * @throws IOException
+	 */
 	private DecisionTreeNode buildTree(List<Feature> featureList, List<Values> valuesList, Feature targetFeature, int level) throws IOException	{
 		
 		if (featureList.size() == 0 || level == 1)	{
@@ -200,6 +250,11 @@ public class DecisionTree {
 		return node;
 	}
 	
+	/**
+	 * Driver method for all tree operations.
+	 * @param args
+	 * @throws IOException
+	 */
 	public void treeOperations(String[] args) throws IOException	{
 		
 		String trainFile = args[0];

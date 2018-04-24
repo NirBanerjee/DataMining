@@ -1,4 +1,5 @@
 /**
+ * Class to define the decision tree node.
  * @author nirmoho-Mac
  *
  */
